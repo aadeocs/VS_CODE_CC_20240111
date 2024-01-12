@@ -43,7 +43,7 @@ int main()
    float matA[10][10], matL[10][10], matU[10][10];
    int n = 0;
 
-   printf("Enter size of square matrix: ");
+   printf("#Enter size of square matrix: ");
    std::cin >> n;
 
    printf("Enter matrix values: ");
