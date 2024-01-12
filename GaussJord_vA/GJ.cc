@@ -63,41 +63,43 @@ void PrintAXB(bool print_x=false)
 /*--------------------------------------------------------------
 | Gaussian Elimination solver for Ax=b
 | - Works with Mata, ColX, and Colb
+| - Should detect singular, dv is very small
+| - Add partial pivoting
 --------------------------------------------------------------*/
 bool GaussianElimination()
 {
-    for(int c = 0; c<COLS; c++)                 // For each col
+    // elimination
+    for(int c = 0; c<COLS; c++)                     // For all cols
     {
         float dv = Mata[c][c];
-        for(int cp=0; cp<COLS; cp++)        // For each col and pivot
+        for(int cp=0; cp<COLS; cp++)                // Normalize the cth row
             Mata[c][cp] /= dv;
         Colb[c]/=dv;
-        //PrintAB();
-        for(int r=c;r<ROWS;r++)                 // For each row in that col
+
+        for(int r=c;r<ROWS;r++)                     // For all rows in that col
         {
-            if(r!=c)
+            if(r!=c)                                // only process non-cth row
             {
                 float dv = Mata[r][c];
-                for(int cp=c; cp<COLS; cp++)        // For each col and pivot
-                    Mata[r][cp] /= dv;
-                Colb[r]/=dv;
-                //PrintAB();
-                for(int cp=c; cp<COLS; cp++)        // For each col and pivot
-                    Mata[r][cp] -= Mata[c][cp];
-                Colb[r]-=Colb[c];
-                //PrintAB();
+                for(int cp=0; cp<COLS; cp++)        // for all cols (could start at c)
+                    Mata[r][cp] /= dv;              // normalize row
+                Colb[r]/=dv;                        // normalize b
+                for(int cp=0; cp<COLS; cp++)        // for all cols (could start at c)
+                    Mata[r][cp] -= Mata[c][cp];     // subtract ref row from current row
+                Colb[r]-=Colb[c];                   // subtract ref b from current b
             }
         }
     }
-    for(int r=ROWS-1;r>=0;r--)          // r: 2, 1, 0
+    // back substitute
+    for(int r=ROWS-1;r>=0;r--)          // r: 2, 1, 0, then c: 2, 2 1, 2 1 0
     {
-        ColX[r]=Colb[r];
-        for(int c=r+1; c<COLS; c++)      // c: 2, 2 1, 2 1 0
+        ColX[r]=Colb[r];                    // start with b
+        for(int c=r+1; c<COLS; c++)         // c: 2, 2 1, 2 1 0
         {
-            ColX[r]-=Mata[r][c]*ColX[c];
+            ColX[r]-=Mata[r][c]*ColX[c];    // subtract precompute terms
         }
     }
-     return true;
+    return true;
 }
 
 /*--------------------------------------------------------------
