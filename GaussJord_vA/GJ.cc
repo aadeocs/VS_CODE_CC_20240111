@@ -17,15 +17,14 @@ void FillAXB()
 {
     Mata[0][0]=2; Mata[0][1]=1; Mata[0][2]=1;
     Mata[1][0]=1; Mata[1][1]=2; Mata[1][2]=1;
-    Mata[2][0]=3.05; Mata[2][1]=3.05; Mata[2][2]=2.05;
+    Mata[2][0]=3.01; Mata[2][1]=3.01; Mata[2][2]=2.01;
     //Mata[2][0]=1; Mata[2][1]=1; Mata[2][2]=2;
     Colb[0]=ColB[0]=4;
     Colb[1]=ColB[1]=4;
-    Colb[2]=ColB[2]=8.3;
+    Colb[2]=ColB[2]=8;
     for(int r=0; r<ROWS; r++)
     {
         MatA[r][0]=Mata[r][0]; MatA[r][1]=Mata[r][1]; MatA[r][2]=Mata[r][2];
-        
         ColX[r]=0;
     }
 }
