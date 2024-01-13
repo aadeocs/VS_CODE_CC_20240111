@@ -77,6 +77,25 @@ void PrintAXB(bool print_x=false)
 }
 
 /*--------------------------------------------------------------
+| //Print Ax=b in matrix with column vectors format
+| //- print_x, false print symbol, else print X values
+--------------------------------------------------------------*/
+void Printab(char *msg, int row, bool print_x=false)
+{
+    printf("%s %d\n",msg,row);
+    for(int r=0; r<ROWS; r++)
+    {
+        printf("  |");
+        for(int c=0; c<COLS; c++)
+        {
+            printf(" %5.2f ",Mata[r][c]);
+        }
+        printf(" |%5.2f | \n",Colb[r]);
+    }
+    printf("\n"); 
+}
+
+/*--------------------------------------------------------------
 | Gaussian Elimination solver for Ax=b
 | - Works with Mata, ColX, and Colb
 | - Should detect singular, dv is very small
@@ -87,11 +106,11 @@ bool GaussianElimination(float mat_a[ROWS][COLS], float col_x[COLS],float col_b[
     // elimination
     for(int c = 0; c<COLS; c++)                     // For all cols
     {
-        float dv = mat_a[c][c];
+        float piv = mat_a[c][c];
         for(int cp=0; cp<COLS; cp++)                // Normalize the cth row
-            mat_a[c][cp] /= dv;
-        col_b[c]/=dv;
-
+            mat_a[c][cp] /= piv;
+        col_b[c]/=piv;
+        Printab("Apply Pivot",c);
         for(int r=c;r<ROWS;r++)                     // For all rows in that col
         {
             if(r!=c)                                // only process non-cth row
@@ -100,9 +119,11 @@ bool GaussianElimination(float mat_a[ROWS][COLS], float col_x[COLS],float col_b[
                 for(int cp=0; cp<COLS; cp++)        // for all cols (could start at c)
                     mat_a[r][cp] /= dv;              // normalize row
                 col_b[r]/=dv;                        // normalize b
+                Printab("Normalize Row",r);
                 for(int cp=0; cp<COLS; cp++)        // for all cols (could start at c)
                     mat_a[r][cp] -= mat_a[c][cp];     // subtract ref row from current row
                 col_b[r]-=col_b[c];                   // subtract ref b from current b
+                Printab("Zero Below Pivot",r);
             }
         }
     }
