@@ -17,24 +17,19 @@ int   Pvt[ROWS];
 --------------------------------------------------------------*/
 void FillAXB()
 {
-    bool near_sing = true;
-    Mata[0][0]=2; Mata[0][1]=1; Mata[0][2]=1;
-    Mata[1][0]=1; Mata[1][1]=2; Mata[1][2]=1;
+    float dv = 0.1;
+    bool near_sing = false;
+    //Mata[0][0]=2; Mata[0][1]=1; Mata[0][2]=1;
+    //Mata[1][0]=1; Mata[1][1]=2; Mata[1][2]=1;
 
-    if(near_sing)
-    {
-        Mata[2][0]=3.01; Mata[2][1]=3.01; Mata[2][2]=2.01;
-        Colb[0]=ColB[0]=4; 
-        Colb[1]=ColB[1]=4; 
-        Colb[2]=ColB[2]=8; 
-    }
-    else
-    {
-        Mata[2][0]=1; Mata[2][1]=1; Mata[2][2]=2;
-        Colb[0]=ColB[0]=1; 
-        Colb[1]=ColB[1]=2; 
-        Colb[2]=ColB[2]=3; 
-    }
+    Mata[0][0]=1; Mata[0][1]=2; Mata[0][2]=3;
+    Mata[1][0]=2; Mata[1][1]=3; Mata[1][2]=1;
+    Mata[2][0]=3+dv; Mata[2][1]=5+dv; Mata[2][2]=4+dv;
+    
+    Colb[0]=ColB[0]=6; 
+    Colb[1]=ColB[1]=6; 
+    Colb[2]=ColB[2]=Mata[2][0]+Mata[2][1]+Mata[2][2]+0.01;
+
     for(int r=0; r<ROWS; r++)
     {
         MatA[r][0]=Mata[r][0]; MatA[r][1]=Mata[r][1]; MatA[r][2]=Mata[r][2];
@@ -77,13 +72,15 @@ void PrintAXB(bool print_x=false)
         else
                 {
             if(r==1)
-                printf(" | %5.2f | =",ColX[r]);
+                printf(" | %12.9f | =",ColX[r]);
             else
-                printf(" | %5.2f |  ",ColX[r]); 
+                printf(" | %12.9f |  ",ColX[r]); 
         }
         printf(" |%5.2f | ",ColB[r]);
         if(print_x)
-            printf(" ( %12.10f ) ",b[r]);
+            printf(" < %12.9f > ",b[r]);
+
+        printf(" ( %d ) ",Pvt[r]);
         printf("\n");
     }
     printf("\n"); 
@@ -103,7 +100,7 @@ void Printab(char *msg, int row, bool print_x=false)
         {
             printf(" %5.2f ",Mata[r][c]);
         }
-        printf(" |%5.2f | \n",Colb[r]);
+        printf(" :%5.2f | \n",Colb[r]);
     }
     printf("\n"); 
 }
@@ -136,7 +133,6 @@ bool GaussianElimination(float mat_a[ROWS][COLS], float col_x[COLS],float col_b[
             mat_a[ Pvt[c]][cp] /= piv;
         col_b[ Pvt[c]]/=piv;
         
-        
         Printab("Apply Pivot",c);
         for(int r=c;r<ROWS;r++)                     // For all rows in that col
         {
@@ -150,7 +146,7 @@ bool GaussianElimination(float mat_a[ROWS][COLS], float col_x[COLS],float col_b[
                 for(int cp=0; cp<COLS; cp++)        // for all cols (could start at c)
                     mat_a[ Pvt[r]][cp] -= mat_a[ Pvt[c]][cp];     // subtract ref row from current row
                 col_b[ Pvt[r]]-=col_b[ Pvt[c]];                   // subtract ref b from current b
-                Printab("Zero Below Pivot",r);
+                Printab("Eliminate Entry",r);
             }
         }
     }
