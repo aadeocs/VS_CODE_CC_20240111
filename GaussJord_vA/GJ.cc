@@ -9,20 +9,32 @@ float Mata[ROWS][COLS];         // Matrix a, working version of A
 float ColB[ROWS];               // Column vector B, original
 float Colb[ROWS];               // Column vector b, working version of B
 float ColX[ROWS];               // Column vector X
-int  Pvt[ROWS];
+float Colx[ROWS];               // Column vector X, working version of X
+int   Pvt[ROWS];
 
 /*--------------------------------------------------------------
 | Prepare matrices and column vectors
 --------------------------------------------------------------*/
 void FillAXB()
 {
+    bool near_sing = true;
     Mata[0][0]=2; Mata[0][1]=1; Mata[0][2]=1;
     Mata[1][0]=1; Mata[1][1]=2; Mata[1][2]=1;
-    //Mata[2][0]=3.01; Mata[2][1]=3.01; Mata[2][2]=2.01;
-    Mata[2][0]=1; Mata[2][1]=1; Mata[2][2]=2;
-    Colb[0]=ColB[0]=1;  //4;
-    Colb[1]=ColB[1]=2;  //4;
-    Colb[2]=ColB[2]=3;  //8;
+
+    if(near_sing)
+    {
+        Mata[2][0]=3.01; Mata[2][1]=3.01; Mata[2][2]=2.01;
+        Colb[0]=ColB[0]=4; 
+        Colb[1]=ColB[1]=4; 
+        Colb[2]=ColB[2]=8; 
+    }
+    else
+    {
+        Mata[2][0]=1; Mata[2][1]=1; Mata[2][2]=2;
+        Colb[0]=ColB[0]=1; 
+        Colb[1]=ColB[1]=2; 
+        Colb[2]=ColB[2]=3; 
+    }
     for(int r=0; r<ROWS; r++)
     {
         MatA[r][0]=Mata[r][0]; MatA[r][1]=Mata[r][1]; MatA[r][2]=Mata[r][2];
@@ -83,7 +95,7 @@ void PrintAXB(bool print_x=false)
 --------------------------------------------------------------*/
 void Printab(char *msg, int row, bool print_x=false)
 {
-    printf("%s %d\n",msg,row);
+    printf("%s [%d] = %d\n",msg,row,Pvt[row]);
     for(int r=0; r<ROWS; r++)
     {
         printf("  |");
@@ -104,16 +116,27 @@ void Printab(char *msg, int row, bool print_x=false)
 --------------------------------------------------------------*/
 bool GaussianElimination(float mat_a[ROWS][COLS], float col_x[COLS],float col_b[COLS])
 {
-    Pvt[0]=1;
-    Pvt[1]=2;
+    Pvt[0]=0;
+    Pvt[1]=1;
+    Pvt[2]=2;
+
+    Pvt[0]=2;
+    Pvt[1]=1;
     Pvt[2]=0;
+
     // elimination
     for(int c = 0; c<COLS; c++)                     // For all cols
     {
+        //for(int r=0; r<ROWS; r++)
+        //{
+        //    
+        //}
         float piv = mat_a[ Pvt[c]][c];
         for(int cp=0; cp<COLS; cp++)                // Normalize the cth row
             mat_a[ Pvt[c]][cp] /= piv;
         col_b[ Pvt[c]]/=piv;
+        
+        
         Printab("Apply Pivot",c);
         for(int r=c;r<ROWS;r++)                     // For all rows in that col
         {
@@ -151,7 +174,9 @@ int main(int argc, char *argv[])
     FillAXB();                          // fill Ax=b
     printf("Original system:\n");
     PrintAXB(false);                    // print original
-    GaussianElimination(Mata,ColX,Colb);              // solve
+    GaussianElimination(Mata,Colx,Colb);              // solve
+    for(int r=0; r<ROWS; r++)
+        ColX[r]=Colx[Pvt[r]];
     printf("Solved system:\n");
     PrintAXB(true);                     // print solution
 }
