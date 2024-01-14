@@ -148,14 +148,13 @@ void Printab(int row, const char *format, ...)
 --------------------------------------------------------------*/
 bool GaussJordan(float mat_a[ROWS][COLS], float col_x[COLS],float col_b[COLS])
 {
-
     // elimination
     for(int c = 0; c<COLS; c++)                     // For all cols
     {
-        float piv = mat_a[ Pvt[c]][c];
+        float piv = mat_a[Pvt[c]][c];
         for(int cp=0; cp<COLS; cp++)                // Normalize the cth row
-            mat_a[ Pvt[c]][cp] /= piv;
-        col_b[ Pvt[c]]/=piv;
+            mat_a[Pvt[c]][cp] /= piv;
+        col_b[Pvt[c]]/=piv;
         
         Printab(c,"Apply Pivot, Pvt[%d]=Row[%d]",c,Pvt[c]);
         for(int r=0;r<ROWS;r++)                     // For all rows in that col
@@ -165,21 +164,25 @@ bool GaussJordan(float mat_a[ROWS][COLS], float col_x[COLS],float col_b[COLS])
                 int zero_c=c;
                 float mpy = mat_a[ Pvt[r]][c];
                 for(int cp=0; cp<COLS; cp++)        // for all cols (could start at c)
-                    mat_a[ Pvt[r]][cp] -= mat_a[ Pvt[c]][cp] *mpy;     // subtract ref row from current row
-                col_b[ Pvt[r]]-=col_b[ Pvt[c]]*mpy;                   // subtract ref b from current b
+                    mat_a[Pvt[r]][cp] -= mat_a[Pvt[c]][cp] *mpy;     // subtract ref row from current row
+                col_b[Pvt[r]]-=col_b[Pvt[c]]*mpy;                   // subtract ref b from current b
                 Printab(r,"Zero Entry, Mpv[%d][%d]=Mat[%d][%d]",r,zero_c,Pvt[r],zero_c);
             }
         }
     }
+    for(int r=0; r<ROWS; r++)
+        col_x[r] = col_b[Pvt[r]];       // get x with pivot undo
     // back substitute
+    /*
     for(int r=ROWS-1;r>=0;r--)          // r: 2, 1, 0, then c: 2, 2 1, 2 1 0
     {
-        col_x[ Pvt[r]]=col_b[ Pvt[r]];                    // start with b
+        col_x[Pvt[r]]=col_b[Pvt[r]];                    // start with b
         //for(int c=r+1; c<COLS; c++)         // c: 2, 2 1, 2 1 0
         //{
         //    col_x[ Pvt[r]]-=mat_a[ Pvt[r]][c]*col_x[ Pvt[c]];    // subtract precompute terms
         //}
     }
+    */
     return true;
 }
 
@@ -193,7 +196,7 @@ int main(int argc, char *argv[])
     PrintAXB(false,"Orignal System:");                    // print original
     GaussJordan(Mata,Colx,Colb);              // solve
     for(int r=0; r<ROWS; r++)
-        ColX[r]=Colx[Pvt[r]];
+        ColX[r]=Colx[r];
     //printf("Solved system:\n");
     PrintAXB(true,"Solved System:");                     // print solution
 }
