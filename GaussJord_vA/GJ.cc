@@ -35,9 +35,9 @@ void FillAXB()
     Mata[1][0]=2; Mata[1][1]=3; Mata[1][2]=1;
     Mata[2][0]=3; Mata[2][1]=1; Mata[2][2]=2;
 
-    float x0=1;
-    float x1=2;
-    float x2=4;
+    float x0=1.2;
+    float x1=3.4;
+    float x2=7.8;
     Colb[0]=ColB[0]=x0*Mata[0][0]+x1*Mata[0][1]+x2*Mata[0][2];
     Colb[1]=ColB[1]=x0*Mata[1][0]+x1*Mata[1][1]+x2*Mata[1][2];
     Colb[2]=ColB[2]=x0*Mata[2][0]+x1*Mata[2][1]+x2*Mata[2][2];
@@ -51,9 +51,9 @@ void FillAXB()
     Pvt[1]=1;
     Pvt[2]=2;
 
-    Pvt[0]=2;
-    Pvt[1]=1;
-    Pvt[2]=0;
+    //Pvt[0]=2;
+    //Pvt[1]=1;
+    //Pvt[2]=0;
 }
 
 /*--------------------------------------------------------------
@@ -104,7 +104,7 @@ void PrintAXB(bool print_x, const char *format, ...)
         }
         printf(" |%6.2f | ",ColB[r]);
         if(print_x)
-            printf(" < %6.3f > ",b[r]);
+            printf(" {%10.7f}",b[r]-ColB[r]);
 
         printf(" ( %d ) ",Pvt[r]);
         printf("\n");
@@ -130,9 +130,9 @@ void Printab(int row, const char *format, ...)
         printf("  |");
         for(int c=0; c<COLS; c++)
         {
-            printf(" %5.2f ",Mata[r][c]);
+            printf(" %5.2f ",Mata[Pvt[r]][c]);
         }
-        printf(" :%6.2f |",Colb[r]);
+        printf(" :%6.2f |",Colb[Pvt[r]]);
         if(r==Pvt[row])
             printf("*");
         printf("\n");
@@ -151,6 +151,22 @@ bool GaussJordan(float mat_a[ROWS][COLS], float col_x[COLS],float col_b[COLS])
     // elimination
     for(int c = 0; c<COLS; c++)                     // For all cols
     {
+        int pvt_index=-1;
+        float pvt_max = 0;
+        for(int r=c; r<ROWS; r++)
+        {
+            if(mat_a[Pvt[r]][c] > pvt_max)
+            {
+                pvt_max = mat_a[Pvt[r]][c];
+                pvt_index = r;
+            }
+        }
+        int tmp = Pvt[c];
+        Pvt[c]=pvt_index;
+        Pvt[pvt_index]=tmp;
+        Printab(c,"Select Pivot, Pvt[%d]=Row[%d]",c,Pvt[c]);
+        
+
         float piv = mat_a[Pvt[c]][c];
         for(int cp=0; cp<COLS; cp++)                // Normalize the cth row
             mat_a[Pvt[c]][cp] /= piv;
